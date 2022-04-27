@@ -1,0 +1,5 @@
+
+1. Install scss : npm i node-sass
+2. Install react dom : npm i react-dom
+3. Install Material UI : https://mui.com/material-ui/getting-started/installation/
+4. MockAPI : https://mockapi.io/

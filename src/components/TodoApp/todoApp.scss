@@ -1,0 +1,43 @@
+
+.todo-app {
+    width: 100%;
+    height: auto;
+    border: 1px solid grey;
+    border-radius: 4px;
+    padding: 0 0.938rem;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+    background-color: #fff;
+}
+.input-search {
+    text-align: left;
+}
+
+@media (min-width: 600px){
+.css-7mt4h1-MuiInputBase-root .MuiInputBase-input {
+    width: 35ch !important;
+}}
+
+.css-7mt4h1-MuiInputBase-root .MuiInputBase-input {
+    border: 1px solid #45aaf2;
+    border-radius: 5px;
+    padding-left: calc(1em + 1px) !important;
+    margin-left: 40px;
+}
+.css-1633um2-MuiPaper-root {
+    box-shadow: none !important;
+}
+
+.list-items {
+    text-align: left;
+}
+.list-items li {
+    margin-top: 10px;
+    border-radius: 5px;
+    background-color: #273c75;
+    font-weight: bold;
+    color: #ff6b81;
+    padding: 0.6rem;
+}
+.list-items li span {
+    cursor: pointer;
+}
