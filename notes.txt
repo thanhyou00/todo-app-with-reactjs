@@ -1,6 +1,7 @@
 
-1. Install scss : npm i node-sass
-2. Install react dom : npm i react-dom
+1. Install scss : https://www.npmjs.com/package/node-sass
+2. Install react dom : https://www.npmjs.com/package/react-dom
 3. Custom scrollbar : https://www.npmjs.com/package/react-custom-scrollbars
 4. Install Material UI : https://mui.com/material-ui/getting-started/installation/
 5. MockAPI : https://mockapi.io/
+6. Fetch API : https://dev.to/silvenleaf/series/15546

@@ -1,3 +1,4 @@
+import CheckIcon from '@mui/icons-material/Check';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -46,31 +47,32 @@ const Search = styled('div')(({ theme }) => ({
     color: theme.palette.text.secondary,
   }));
 
-
 function TodoApp() {
     const [list, setList] = useState([]);
-    function handleFetchData(url) {
+    const [value, setValue] = useState('')
+    const [search, setSearch] = useState('')
+
+    const url = 'https://626a10a353916a0fbdf4db6d.mockapi.io/reactTodo';
+    function handleFetchData(url, search) {
       fetch(url)
       .then( response =>{
         return response.json( );
       })
-      .then( data =>{
-        setList(data)
+      .then(data =>{
+      setList(data.filter(x=>x.title.toLowerCase().includes(search.toLowerCase())))
       });   
     }
     useEffect(()=>{
         async function fetchList() {
           try {
-            const url = 'https://626a10a353916a0fbdf4db6d.mockapi.io/reactTodo';
-            handleFetchData(url)
+            handleFetchData(url, search)
           } catch (error) {
             console.log('Faild to fetch ', error.message);
           }
         }
         fetchList();
-    },[])
+    },[search])
     async function handleDelete(id) {
-      const url = 'https://626a10a353916a0fbdf4db6d.mockapi.io/reactTodo';
      await fetch(url+'/'+id, {
         method: 'DELETE',
         headers: {
@@ -78,13 +80,55 @@ function TodoApp() {
         },
     })
     .then(response =>{
+      handleFetchData(url); //refetch data before delete
       return response.json()
     })
     .then(data => 
         console.log(data) 
     );
-    // refetch data before delete
-      handleFetchData(url);
+    }
+    function handleValueChange(e) {
+      setValue(e.target.value)
+    }
+    function handleUpdateStatus(id) {
+      const myDataObject = { status : true};
+      fetch(url+'/'+id, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(myDataObject)
+      })
+      .then(response => {
+          handleFetchData(url); //refetch data before update status
+          return response.json( )
+      })
+      .then(data => 
+          // this is the data we get after putting our data, do whatever you want with this data
+          console.log(data) 
+      );
+    }
+    function handleAdd(e) {
+      e.preventDefault();
+      const myDataObject = {title : value, status : false};
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(myDataObject)
+      })
+      .then(response => {
+        handleFetchData(url); //refetch data before add
+        setValue('')
+          return response.json( )
+      })
+      .then(data => 
+          console.log(data) 
+      );
+    }
+    function handleSearch(e) {
+      setSearch(e.target.value)
     }
     return (
         <div className='todo-app'>
@@ -99,6 +143,8 @@ function TodoApp() {
               <StyledInputBase
                 placeholder="Type here to search ..."
                 inputProps={{ 'aria-label': 'search' }}
+                value={search}
+                onChange={handleSearch}
               />
               </Search>
             </div>
@@ -107,10 +153,18 @@ function TodoApp() {
               <div className='input-search'>
               <Search>
               <p style={{fontSize:'1.25rem', marginLeft:'2.188rem', fontWeight:'bolder'}}>Add a new todo</p>
-              <StyledInputBase
+            <form>
+            <StyledInputBase
                 inputProps={{ 'aria-label': 'search' }}
+                value={value}
+                onChange={handleValueChange}
               />
-              <span style={{marginLeft: '1rem'}}><Button variant="contained">Add</Button></span>
+              <span style={{marginLeft: '1rem'}}>
+              <Button 
+              variant="contained"
+              onClick={handleAdd}
+              >Add</Button></span>
+               </form>
               </Search>
             </div>
               </Grid>
@@ -121,9 +175,10 @@ function TodoApp() {
                 <div className='list-items'>
                 <ul style={{listStyle: 'none'}}>
                   {list.map(x=>(
-                    <li key={x.id}> 
+                    <li key={x.id} style={{backgroundColor: x.status===true?'#26de81':'#273c75' }}> 
                     {x.title}
                     <span style={{float: 'right'}} onClick={()=>{handleDelete(x.id)}}> <ClearOutlinedIcon /> </span>
+                    <span style={{float:'right'}} onClick={()=>{handleUpdateStatus(x.id)}}> <CheckIcon /> </span>
                     </li> 
                   ))}               
                 </ul>
