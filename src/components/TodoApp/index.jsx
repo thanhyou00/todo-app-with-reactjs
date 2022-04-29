@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
 import { alpha, styled } from '@mui/material/styles';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './todoApp.scss';
 
 const Search = styled('div')(({ theme }) => ({
@@ -51,6 +51,8 @@ function TodoApp() {
     const [list, setList] = useState([]);
     const [value, setValue] = useState('')
     const [search, setSearch] = useState('')
+    const [filter, setFilter] = useState('')
+    const typeingTimeoutRef = useRef(null)
 
     const url = 'https://626a10a353916a0fbdf4db6d.mockapi.io/reactTodo';
     function handleFetchData(url, search) {
@@ -65,13 +67,13 @@ function TodoApp() {
     useEffect(()=>{
         async function fetchList() {
           try {
-            handleFetchData(url, search)
+            handleFetchData(url, filter)
           } catch (error) {
             console.log('Faild to fetch ', error.message);
           }
         }
         fetchList();
-    },[search])
+    },[filter])
     async function handleDelete(id) {
      await fetch(url+'/'+id, {
         method: 'DELETE',
@@ -128,7 +130,15 @@ function TodoApp() {
       );
     }
     function handleSearch(e) {
+
       setSearch(e.target.value)
+      if(typeingTimeoutRef.current) {
+        clearTimeout(typeingTimeoutRef.current)
+    }
+    // using debounce
+    typeingTimeoutRef.current = setTimeout(() => {
+      setFilter(e.target.value)
+    }, 1000);
     }
     return (
         <div className='todo-app'>
