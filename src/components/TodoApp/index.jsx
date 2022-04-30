@@ -217,6 +217,7 @@ function TodoApp() {
             </div>
               </Grid>
             </Grid>
+            <br />
             <Grid container >
                 <Grid item xs={12}>
                 <Item>
