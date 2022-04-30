@@ -1,19 +1,17 @@
 import CheckIcon from '@mui/icons-material/Check';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import InputBase from '@mui/material/InputBase';
-import Paper from '@mui/material/Paper';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
-import { alpha, styled, } from '@mui/material/styles';
-import React, { useEffect, useRef, useState } from 'react';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
 import Slide from '@mui/material/Slide';
+import { alpha, styled, useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import React, { useEffect, useRef, useState } from 'react';
 import './todoApp.scss';
 
 const Search = styled('div')(({ theme }) => ({
@@ -30,23 +28,7 @@ const Search = styled('div')(({ theme }) => ({
       width: 'auto',
     },
   }));
-  
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      width: '100%',
-      [theme.breakpoints.up('sm')]: {
-        width: '12ch',
-        '&:focus': {
-          width: '20ch',
-        },
-      },
-    },
-  }));  
+   
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
     ...theme.typography.body2,
@@ -208,12 +190,10 @@ function TodoApp() {
               <div className='input-search'>
               <Search>
               <p style={{fontSize:'1.25rem', marginLeft:'2.188rem', fontWeight:'bolder'}}>Search</p>
-              <StyledInputBase
-                placeholder="Type here to search ..."
-                inputProps={{ 'aria-label': 'search' }}
-                value={search}
-                onChange={handleSearch}
-              />
+              <input type="text" 
+              className='input-search-debounce'                
+              value={search}
+              onChange={handleSearch} />
               </Search>
             </div>
               </Grid>
@@ -222,8 +202,8 @@ function TodoApp() {
               <Search>
               <p style={{fontSize:'1.25rem', marginLeft:'2.188rem', fontWeight:'bolder'}}>Add a new todo</p>
             <form>
-            <StyledInputBase
-                inputProps={{ 'aria-label': 'add' }}
+            <input
+                className='input-add'
                 value={value}
                 onChange={handleValueChange}
               />
@@ -275,10 +255,11 @@ function TodoApp() {
                   </DialogTitle>
                   <DialogContent>
                     <DialogContentText component={'span'} variant={'body2'}>
-                        <StyledInputBase 
-                        inputProps={{ 'aria-label': 'update' }}
+                      <input type="text" 
+                        className='input-update'
                         value={valueUpdate.title} 
-                        onChange={handleUpdateChange} />
+                        onChange={handleUpdateChange}
+                      />
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
