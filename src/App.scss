@@ -7,8 +7,20 @@
   min-height: 100vh;
   display: flex;
   align-items: center;
-  padding: 3rem 5rem;
+  padding: 3.5rem 3.5rem;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  background-color: #00a8ff;
+  background-color: #ffff;
+}
+
+@media (max-width:500px) {
+  .App {
+  padding: 2.5rem 1rem;
+  }
+}
+
+@media (max-width:1100px) {
+  .App {
+    padding: 2.5rem 1rem;
+  }
 }

@@ -4,8 +4,16 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
-import { alpha, styled } from '@mui/material/styles';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import { alpha, styled, } from '@mui/material/styles';
 import React, { useEffect, useRef, useState } from 'react';
+import Slide from '@mui/material/Slide';
 import './todoApp.scss';
 
 const Search = styled('div')(({ theme }) => ({
@@ -46,14 +54,39 @@ const Search = styled('div')(({ theme }) => ({
     textAlign: 'center',
     color: theme.palette.text.secondary,
   }));
+  const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+  });
 
 function TodoApp() {
     const [list, setList] = useState([]);
     const [value, setValue] = useState('')
     const [search, setSearch] = useState('')
     const [filter, setFilter] = useState('')
+    const [valueUpdate, setValueUpdate] = useState({
+      id : '',
+      title : '',
+      status : ''
+    })
     const typeingTimeoutRef = useRef(null)
+    const [open, setOpen] = useState(false);
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
+    const handleClickOpen = (id) => {
+      setOpen(true);
+      fetch(url+'/'+id)
+      .then( response =>{
+        return response.json( );
+      })
+      .then(data =>{
+      setValueUpdate(data)
+      }); 
+    };
+  
+    const handleClose = () => {
+      setOpen(false);
+    };
     const url = 'https://626a10a353916a0fbdf4db6d.mockapi.io/reactTodo';
     function handleFetchData(url, search) {
       fetch(url)
@@ -61,7 +94,7 @@ function TodoApp() {
         return response.json( );
       })
       .then(data =>{
-      setList(data.filter(x=>x.title.toLowerCase().includes(search.toLowerCase())))
+      setList(data.filter(x=>x.title.includes(search)))
       });   
     }
     useEffect(()=>{
@@ -82,7 +115,7 @@ function TodoApp() {
         },
     })
     .then(response =>{
-      handleFetchData(url); //refetch data before delete
+      handleFetchData(url, search); //refetch data before delete
       return response.json()
     })
     .then(data => 
@@ -91,6 +124,12 @@ function TodoApp() {
     }
     function handleValueChange(e) {
       setValue(e.target.value)
+    }
+    function handleUpdateChange(e) {
+      setValueUpdate({
+        ...valueUpdate,
+        title : e.target.value
+      })
     }
     function handleUpdateStatus(id) {
       const myDataObject = { status : true};
@@ -102,8 +141,27 @@ function TodoApp() {
           body: JSON.stringify(myDataObject)
       })
       .then(response => {
-          handleFetchData(url); //refetch data before update status
+          handleFetchData(url, search); //refetch data before update status
           return response.json( )
+      })
+      .then(data => 
+          // this is the data we get after putting our data, do whatever you want with this data
+          console.log(data) 
+      );
+    }
+    function handleUpdateTitle(id, title) {
+      const myDataObject = { title : title};
+      fetch(url+'/'+id, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(myDataObject)
+      })
+      .then(response => {
+          handleFetchData(url, search); //refetch data before update status
+          handleClose()
+          return response.json()
       })
       .then(data => 
           // this is the data we get after putting our data, do whatever you want with this data
@@ -121,7 +179,7 @@ function TodoApp() {
         body: JSON.stringify(myDataObject)
       })
       .then(response => {
-        handleFetchData(url); //refetch data before add
+        handleFetchData(url, search); //refetch data before add
         setValue('')
           return response.json( )
       })
@@ -130,9 +188,8 @@ function TodoApp() {
       );
     }
     function handleSearch(e) {
-
-      setSearch(e.target.value)
-      if(typeingTimeoutRef.current) {
+    setSearch(e.target.value)
+    if(typeingTimeoutRef.current) {
         clearTimeout(typeingTimeoutRef.current)
     }
     // using debounce
@@ -140,10 +197,11 @@ function TodoApp() {
       setFilter(e.target.value)
     }, 1000);
     }
+
     return (
         <div className='todo-app'>
             <Grid container >
-                <Grid item xs={12}>
+                <Grid item xs={12} >
             <h4>Welcome to my TodoAPP</h4>
             <Grid container >
               <Grid item xs={12} md={6}>
@@ -165,11 +223,11 @@ function TodoApp() {
               <p style={{fontSize:'1.25rem', marginLeft:'2.188rem', fontWeight:'bolder'}}>Add a new todo</p>
             <form>
             <StyledInputBase
-                inputProps={{ 'aria-label': 'search' }}
+                inputProps={{ 'aria-label': 'add' }}
                 value={value}
                 onChange={handleValueChange}
               />
-              <span style={{marginLeft: '1rem'}}>
+              <span style={{marginLeft: '2.5rem'}}>
               <Button 
               variant="contained"
               onClick={handleAdd}
@@ -181,20 +239,57 @@ function TodoApp() {
             </Grid>
             <Grid container >
                 <Grid item xs={12}>
-                    <Item>
+                <Item>
                 <div className='list-items'>
-                <ul style={{listStyle: 'none'}}>
-                  {list.map(x=>(
-                    <li key={x.id} style={{backgroundColor: x.status===true?'#26de81':'#273c75' }}> 
-                    {x.title}
-                    <span style={{float: 'right'}} onClick={()=>{handleDelete(x.id)}}> <ClearOutlinedIcon /> </span>
-                    <span style={{float:'right'}} onClick={()=>{handleUpdateStatus(x.id)}}> <CheckIcon /> </span>
-                    </li> 
-                  ))}               
-                </ul>
+                  <ul style={{listStyle: 'none'}}>
+                    {list.map(x=>(
+                      <li key={x.id} style={{backgroundColor: x.status===true?'#26de81':'#273c75'}}
+                      > 
+                      <span style={{cursor:'pointer'}} onClick={()=>handleClickOpen(x.id)}> {x.title} </span>
+                      <span style={{float: 'right'}} onClick={()=>{handleDelete(x.id)}}> <ClearOutlinedIcon /> </span>           
+                      </li>     
+                    ))}               
+                  </ul>         
                 </div> 
                 </Item>                   
                 </Grid>
+                <Dialog
+                  fullScreen={fullScreen}
+                  open={open}
+                  TransitionComponent={Transition}
+                  onClose={handleClose}
+                  aria-labelledby="responsive-dialog-title"
+                >
+                  <DialogTitle id={valueUpdate.id}>
+                    {"Update a todo"}
+                    {
+                      !valueUpdate.status &&
+                      <>
+                      <span style={
+                        {float:'right', backgroundColor:'#26de81',color:'#ffff', padding: '0.3rem',borderRadius:'0.5rem',cursor:'pointer'}
+                        } onClick={()=>{handleUpdateStatus(valueUpdate.id)}}> <CheckIcon /> 
+                      Done
+                      </span> 
+                      </>
+                    }
+                  </DialogTitle>
+                  <DialogContent>
+                    <DialogContentText component={'span'} variant={'body2'}>
+                        <StyledInputBase 
+                        inputProps={{ 'aria-label': 'update' }}
+                        value={valueUpdate.title} 
+                        onChange={handleUpdateChange} />
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button autoFocus onClick={handleClose}>
+                      Cancel
+                    </Button>
+                    <Button autoFocus onClick={()=>{handleUpdateTitle(valueUpdate.id, valueUpdate.title)}}>
+                      Update
+                    </Button>
+                  </DialogActions>
+                </Dialog> 
             </Grid>
             </Grid>
             </Grid>

@@ -6,10 +6,15 @@
     border-radius: 4px;
     padding: 0 0.938rem;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
-    background-color: #fff;
+    background-color: #ffff;
 }
 .input-search {
     text-align: left;
+}
+@media (max-width:600px) {
+    .css-sghohy-MuiButtonBase-root-MuiButton-root { 
+        margin-top: 1.5rem !important;
+    }    
 }
 
 @media (min-width: 600px){
