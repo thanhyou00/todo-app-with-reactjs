@@ -152,22 +152,26 @@ function TodoApp() {
     }
     function handleAdd(e) {
       e.preventDefault();
-      const myDataObject = {title : value, status : false};
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(myDataObject)
-      })
-      .then(response => {
-        handleFetchData(url, search); //refetch data before add
-        setValue('')
-          return response.json( )
-      })
-      .then(data => 
-          console.log(data) 
-      );
+      if(value.trim().length<=0) {
+        return
+      } else {
+        const myDataObject = {title : value, status : false};
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(myDataObject)
+        })
+        .then(response => {
+          handleFetchData(url, search); //refetch data before add
+          setValue('')
+            return response.json( )
+        })
+        .then(data => 
+            console.log(data) 
+        );
+      }
     }
     function handleSearch(e) {
     setSearch(e.target.value)
@@ -219,7 +223,7 @@ function TodoApp() {
             </Grid>
             <br />
             <Grid container >
-                <Grid item xs={12}>
+                <Grid item xs={12} >
                 <Item>
                 <div className='list-items'>
                   <ul style={{listStyle: 'none'}}>
