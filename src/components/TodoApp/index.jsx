@@ -152,6 +152,12 @@ function TodoApp() {
     }
     function handleAdd(e) {
       e.preventDefault();
+      for(var i=0;i<list.length;i++) {
+        if(value===list[i].title) {
+          alert("Todo đã tồn tại");
+          return
+        }
+      }
       if(value.trim().length<=0) {
         return
       } else {
